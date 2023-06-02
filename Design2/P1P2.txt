@@ -1,0 +1,78 @@
+{Design Project 2}
+
+$UNITSYSTEM ENG
+
+{Part 1}
+
+volume=30*35*10.5 {From given values}
+infiltrationRate=0.5 {Given}
+
+v_dot=volume*infiltration_rate[ft^3/hr]
+
+{Part a}
+P=13.26[psi] {From climate tables}
+
+DB_outdoor=95.7[F] {From climate tables}
+WB_outdoor=62.8[F] {From climate tables}
+HR_outdoor=humrat(AirH2O,T=DB_outdoor,B=WB_outdoor,P=P)
+h_outdoor=enthalpy(AirH2O,T=DB_outdoor,B=WB_outdoor,P=P)
+
+DB_indoor=72[F] {Given}
+RH_indoor=0.50 {Given}
+HR_indoor=humrat(AirH2O,T=DB_indoor,R=RH_indoor,P=P)
+WB_indoor=wetbulb(AirH2O,T=DB_indoor,R=RH_indoor,P=P)
+h_indoor=enthalpy(AirH2O,T=DB_indoor,R=RH_indoor,P=P)
+h_fg_indoor=enthalpy_vaporization(Water,T=DB_indoor)
+
+specificVolume_outdoor=volume(AirH2O,T=DB_outdoor,B=WB_outdoor,P=P)
+specificTemperaute_outdoor=cp(AirH2O,T=DB_outdoor,B=WB_outdoor,P=P)
+
+m_dot=v_dot/specificVolume_outdoor
+
+Q_dot_sensible_infiltration=m_dot*specificTemperaute_outdoor*(DB_outside-DB_inside)
+Q_dot_latent_infiltration=m_dot*(HR_outside-HR_inside)*h_fg_indoor
+Q_dot_total_infiltration=Q_dot_sensible_infiltration+Q_dot_latent_infiltration
+
+{Part b}
+occupancy=30
+
+Q_total=550[BTU/hr]
+Q_latent=275[BTU/hr]
+Q_sensible=275[BTU/hr]
+
+Q_dot_sensible_occupancy=Q_sensible*occupancy
+Q_dot_latent_occupancy=Q_latent*occupancy
+Q_dot_total_occupancy=Q_dot_sensible_occupancy+Q_dot_latent_occupancy
+
+{Part c}
+LPD=0.65*convert(W,BTU/hr) {From tables}
+Q_dot_sensible_lighting=LPD*30*35
+
+{Part d}
+Q_dot_sensible_equipment=1050*30*35*convert(W,BTU/hr)
+Q_dot_latent_equipment=3000*30*35*convert(W,BTU/hr)
+Q_dot_total_equipment=Q_dot_sensible_equipment+Q_dot_latent_equipment
+
+{Part e}
+U=0.5 {Given}
+surfaceArea=30*35+30*10.5+35*10.5 {From given values}
+Q_dot_buildingEnvelope=U*surfaceArea*(DB_outdoor-DB_indoor)
+
+{Part f}
+Q_dot_sensible=Q_dot_sensible_infiltration+Q_dot_sensible_occupancy+Q_dot_sensible_lighting+Q_dot_sensible_equipment+Q_dot_buildingEnvelope
+Q_dot_latent=Q_dot_latent_infiltration+Q_dot_latent_occupancy+Q_dot_latent_equipment
+Q_dot_total=Q_dot_sensible+Q_dot_latent
+
+{Part 2}
+T_average=(T_outdoor-T_indoor)/2
+Q_dot_total=m_dot_2*specificTemperature_outdoor*(DB_outdoor-DB_indoor)
+V_dot_air=m_dot_2*convert(lbm/hr,lbm/min)*specificVolume_outdoor
+h_fg_average=enthalpy_vaportization(Water,T=T_average)
+
+Q_dot_water=m_dot_water*h_fg_average
+specificVolume_water=volume(Water,T=T_average,P=P)
+V_dot_water=m_dot_water*specificVolume_water*convert(ft^3,gal)
+
+cooler_effectiveness=(DB_outdoor-DB_indoor)/(DB_outdoor-WB_indoor)
+
+
